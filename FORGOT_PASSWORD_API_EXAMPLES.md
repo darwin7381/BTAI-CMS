@@ -375,3 +375,299 @@ export default function ResetPasswordPage() {
 2. **驗證**: 始終驗證前端和後端的輸入
 3. **HTTPS**: 在生產環境中使用 HTTPS
 4. **敏感訊息**: 避免在錯誤訊息中洩露敏感資訊 
+
+## 7. 用戶註冊
+
+新用戶註冊帳號的 API 端點。
+
+### 端點
+```
+POST http://localhost:1337/api/auth/local/register
+```
+
+### 請求範例 (JavaScript/Fetch)
+```javascript
+const registerUser = async (username, email, password) => {
+  try {
+    const response = await fetch('http://localhost:1337/api/auth/local/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username,
+        email: email,
+        password: password
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('註冊成功', data);
+      return { 
+        success: true, 
+        user: data.user, 
+        jwt: data.jwt,
+        message: '註冊成功！請檢查您的電子郵件進行帳號確認。'
+      };
+    } else {
+      const errorData = await response.json();
+      console.error('註冊失敗:', errorData);
+      return { success: false, message: errorData.error.message };
+    }
+  } catch (error) {
+    console.error('網路錯誤:', error);
+    return { success: false, message: '網路錯誤，請稍後再試' };
+  }
+};
+```
+
+### 請求範例 (cURL)
+```bash
+curl -X POST http://localhost:1337/api/auth/local/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "testuser",
+    "email": "testuser@example.com",
+    "password": "testpassword123"
+  }'
+```
+
+## 8. 確認電子郵件地址
+
+用戶點擊確認郵件中的連結後自動執行，或手動確認。
+
+### 端點
+```
+GET http://localhost:1337/api/auth/email-confirmation?confirmation=CONFIRMATION_TOKEN
+```
+
+### 請求範例 (JavaScript/Fetch)
+```javascript
+const confirmEmail = async (confirmationToken) => {
+  try {
+    const response = await fetch(`http://localhost:1337/api/auth/email-confirmation?confirmation=${confirmationToken}`, {
+      method: 'GET',
+    });
+
+    if (response.ok) {
+      console.log('電子郵件確認成功');
+      return { success: true, message: '電子郵件確認成功，您的帳號已啟用！' };
+    } else {
+      const errorData = await response.json();
+      console.error('確認失敗:', errorData);
+      return { success: false, message: '確認連結無效或已過期' };
+    }
+  } catch (error) {
+    console.error('網路錯誤:', error);
+    return { success: false, message: '網路錯誤，請稍後再試' };
+  }
+};
+```
+
+## 9. 用戶登入
+
+已註冊用戶的登入 API。
+
+### 端點
+```
+POST http://localhost:1337/api/auth/local
+```
+
+### 請求範例 (JavaScript/Fetch)
+```javascript
+const loginUser = async (identifier, password) => {
+  try {
+    const response = await fetch('http://localhost:1337/api/auth/local', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        identifier: identifier, // 可以是 email 或 username
+        password: password
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('登入成功', data);
+      // 儲存 JWT token 以供後續 API 請求使用
+      localStorage.setItem('jwt', data.jwt);
+      return { success: true, user: data.user, jwt: data.jwt };
+    } else {
+      const errorData = await response.json();
+      console.error('登入失敗:', errorData);
+      return { success: false, message: errorData.error.message };
+    }
+  } catch (error) {
+    console.error('網路錯誤:', error);
+    return { success: false, message: '網路錯誤，請稍後再試' };
+  }
+};
+```
+
+## 10. React 表單範例
+
+### 註冊表單
+```jsx
+import React, { useState } from 'react';
+
+const RegisterForm = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    const result = await registerUser(
+      formData.username, 
+      formData.email, 
+      formData.password
+    );
+    
+    setMessage(result.message);
+    setLoading(false);
+    
+    if (result.success) {
+      setFormData({ username: '', email: '', password: '' });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium">用戶名</label>
+        <input
+          type="text"
+          value={formData.username}
+          onChange={(e) => setFormData({...formData, username: e.target.value})}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium">電子郵件</label>
+        <input
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({...formData, email: e.target.value})}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium">密碼</label>
+        <input
+          type="password"
+          value={formData.password}
+          onChange={(e) => setFormData({...formData, password: e.target.value})}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      
+      <button 
+        type="submit" 
+        disabled={loading}
+        className="w-full bg-blue-500 text-white p-2 rounded disabled:opacity-50"
+      >
+        {loading ? '註冊中...' : '註冊'}
+      </button>
+      
+      {message && (
+        <div className={`p-2 rounded ${message.includes('成功') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          {message}
+        </div>
+      )}
+    </form>
+  );
+};
+
+export default RegisterForm;
+```
+
+### 忘記密碼表單
+```jsx
+import React, { useState } from 'react';
+
+const ForgotPasswordForm = () => {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    const result = await forgotPassword(email);
+    
+    setMessage(result.message);
+    setLoading(false);
+    
+    if (result.success) {
+      setEmail('');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium">電子郵件地址</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-2 border rounded"
+          placeholder="輸入您的電子郵件地址"
+          required
+        />
+      </div>
+      
+      <button 
+        type="submit" 
+        disabled={loading}
+        className="w-full bg-blue-500 text-white p-2 rounded disabled:opacity-50"
+      >
+        {loading ? '發送中...' : '發送重設密碼郵件'}
+      </button>
+      
+      {message && (
+        <div className={`p-2 rounded ${message.includes('成功') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          {message}
+        </div>
+      )}
+    </form>
+  );
+};
+
+export default ForgotPasswordForm;
+```
+
+## 11. 權限設置提醒
+
+確保在 Strapi 管理面板中設置了正確的權限：
+
+### Public 角色權限 (Settings → Users & Permissions → Roles → Public)
+- **Users-permissions**:
+  - ✅ Auth: register, forgotPassword, resetPassword, emailConfirmation
+  - ✅ 勾選這些權限以允許公開訪問
+
+### Authenticated 角色權限 (已登入用戶的權限)
+- 根據需求設置其他 API 端點的權限
+
+## 12. 測試流程
+
+1. **註冊新用戶** → 接收確認郵件 → 點擊確認連結
+2. **忘記密碼** → 接收重設郵件 → 點擊連結 → 輸入新密碼
+3. **登入** → 使用新密碼登入系統
+
+這樣就完成了完整的用戶認證系統！ 
