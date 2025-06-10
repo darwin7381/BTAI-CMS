@@ -373,6 +373,54 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiArticleTemplateArticleTemplate
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'article_templates';
+  info: {
+    description: '\u6587\u7A3F\u6A21\u677F\u7BA1\u7406';
+    displayName: 'Article Template';
+    pluralName: 'article-templates';
+    singularName: 'article-template';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    defaultAuthor: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
+    footerAdvertising: Schema.Attribute.Text;
+    footerHtml: Schema.Attribute.Text & Schema.Attribute.Required;
+    headerNote: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::article-template.article-template'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+        minLength: 2;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    type: Schema.Attribute.Enumeration<['sponsored', 'news', 'review']> &
+      Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
   collectionName: 'authors';
   info: {
@@ -405,6 +453,75 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     wordpressId: Schema.Attribute.Integer;
+  };
+}
+
+export interface ApiWordpressSettingWordpressSetting
+  extends Struct.SingleTypeSchema {
+  collectionName: 'wordpress_settings';
+  info: {
+    description: 'WordPress \u767C\u5E03\u8A2D\u5B9A';
+    displayName: 'WordPress Settings';
+    pluralName: 'wordpress-settings';
+    singularName: 'wordpress-setting';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    autoPublish: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    customFooterHtml: Schema.Attribute.Text & Schema.Attribute.DefaultTo<''>;
+    defaultAuthor: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
+    defaultCategory: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }> &
+      Schema.Attribute.DefaultTo<'\u672A\u5206\u985E'>;
+    defaultStatus: Schema.Attribute.Enumeration<
+      ['draft', 'pending', 'publish', 'private']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'draft'>;
+    defaultTags: Schema.Attribute.Text & Schema.Attribute.DefaultTo<''>;
+    featuredImageRequired: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    isActive: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::wordpress-setting.wordpress-setting'
+    > &
+      Schema.Attribute.Private;
+    metaDescription: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }> &
+      Schema.Attribute.DefaultTo<''>;
+    publishedAt: Schema.Attribute.DateTime;
+    seoSettings: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;
+    siteName: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }> &
+      Schema.Attribute.DefaultTo<'\u7DB2\u7AD9\u540D\u7A31'>;
+    siteUrl: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -917,7 +1034,9 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::article-template.article-template': ApiArticleTemplateArticleTemplate;
       'api::author.author': ApiAuthorAuthor;
+      'api::wordpress-setting.wordpress-setting': ApiWordpressSettingWordpressSetting;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
