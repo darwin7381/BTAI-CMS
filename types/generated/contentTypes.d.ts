@@ -373,48 +373,50 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiArticleTemplateArticleTemplate
+export interface ApiArticleTypePresetArticleTypePreset
   extends Struct.CollectionTypeSchema {
-  collectionName: 'article_templates';
+  collectionName: 'article_type_presets';
   info: {
-    description: '\u6587\u7A3F\u6A21\u677F\u7BA1\u7406';
-    displayName: 'Article Template';
-    pluralName: 'article-templates';
-    singularName: 'article-template';
+    description: '\u6587\u7A3F\u985E\u578B\u7D44\u5408\u914D\u7F6E\u7BA1\u7406';
+    displayName: 'Article Type Presets';
+    pluralName: 'article-type-presets';
+    singularName: 'article-type-preset';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
+    advancedSettings: Schema.Attribute.JSON;
+    code: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     defaultAuthor: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
-    footerAdvertising: Schema.Attribute.Text;
-    footerHtml: Schema.Attribute.Text & Schema.Attribute.Required;
-    headerNote: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 200;
-      }>;
-    isActive: Schema.Attribute.Boolean &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<true>;
+    description: Schema.Attribute.Text;
+    footerDisclaimerTemplate: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::footer-disclaimer-template.footer-disclaimer-template'
+    >;
+    headerDisclaimerTemplate: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::header-disclaimer-template.header-disclaimer-template'
+    >;
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    isSystemDefault: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
-      'api::article-template.article-template'
+      'api::article-type-preset.article-type-preset'
     > &
       Schema.Attribute.Private;
-    name: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 100;
-        minLength: 2;
-      }>;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    type: Schema.Attribute.Enumeration<['sponsored', 'news', 'review']> &
-      Schema.Attribute.Required;
+    requiresAdTemplate: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    sortOrder: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -424,18 +426,19 @@ export interface ApiArticleTemplateArticleTemplate
 export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
   collectionName: 'authors';
   info: {
-    displayName: 'Author';
+    description: '\u6587\u7AE0\u4F5C\u8005\u7BA1\u7406';
+    displayName: 'Authors';
     pluralName: 'authors';
     singularName: 'author';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    department: Schema.Attribute.Enumeration<['BTEditor', 'BTVerse', 'custom']>;
+    department: Schema.Attribute.String;
     description: Schema.Attribute.Text;
     displayName: Schema.Attribute.String & Schema.Attribute.Required;
     isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
@@ -456,69 +459,121 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiWordpressSettingWordpressSetting
+export interface ApiDefaultContentSettingDefaultContentSetting
   extends Struct.SingleTypeSchema {
-  collectionName: 'wordpress_settings';
+  collectionName: 'default_content_setting';
   info: {
-    description: 'WordPress \u767C\u5E03\u8A2D\u5B9A';
-    displayName: 'WordPress Settings';
-    pluralName: 'wordpress-settings';
-    singularName: 'wordpress-setting';
+    description: '\u9810\u8A2D\u5167\u5BB9\u8A2D\u5B9A - \u7BA1\u7406\u524D\u60C5\u63D0\u8981\u3001\u80CC\u666F\u88DC\u5145\u3001\u76F8\u95DC\u95B1\u8B80\u7684\u9810\u8A2D\u6587\u7AE0';
+    displayName: 'Default Content Settings';
+    pluralName: 'default-content-settings';
+    singularName: 'default-content-setting';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    backgroundArticle: Schema.Attribute.Component<
+      'content.article-link',
+      false
+    >;
+    contextArticle: Schema.Attribute.Component<'content.article-link', false>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::default-content-setting.default-content-setting'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    relatedReadingArticles: Schema.Attribute.Component<
+      'content.article-link',
+      true
+    > &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 5;
+        },
+        number
+      >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiFooterDisclaimerTemplateFooterDisclaimerTemplate
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'footer_disclaimer_templates';
+  info: {
+    description: '\u6587\u7AE0\u672B\u5C3E\u62BC\u8A3B\u6A21\u677F\u7BA1\u7406';
+    displayName: 'Footer Disclaimer Templates';
+    pluralName: 'footer-disclaimer-templates';
+    singularName: 'footer-disclaimer-template';
   };
   options: {
     draftAndPublish: false;
   };
   attributes: {
-    autoPublish: Schema.Attribute.Boolean &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<false>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    customFooterHtml: Schema.Attribute.Text & Schema.Attribute.DefaultTo<''>;
-    defaultAuthor: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
-    defaultCategory: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 50;
-      }> &
-      Schema.Attribute.DefaultTo<'\u672A\u5206\u985E'>;
-    defaultStatus: Schema.Attribute.Enumeration<
-      ['draft', 'pending', 'publish', 'private']
-    > &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'draft'>;
-    defaultTags: Schema.Attribute.Text & Schema.Attribute.DefaultTo<''>;
-    featuredImageRequired: Schema.Attribute.Boolean &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<true>;
-    isActive: Schema.Attribute.Boolean &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<true>;
+    description: Schema.Attribute.Text;
+    displayName: Schema.Attribute.String & Schema.Attribute.Required;
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    isSystemDefault: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
-      'api::wordpress-setting.wordpress-setting'
+      'api::footer-disclaimer-template.footer-disclaimer-template'
     > &
       Schema.Attribute.Private;
-    metaDescription: Schema.Attribute.Text &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160;
-      }> &
-      Schema.Attribute.DefaultTo<''>;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
     publishedAt: Schema.Attribute.DateTime;
-    seoSettings: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;
-    siteName: Schema.Attribute.String &
+    template: Schema.Attribute.RichText & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiHeaderDisclaimerTemplateHeaderDisclaimerTemplate
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'header_disclaimer_templates';
+  info: {
+    description: '\u6587\u7AE0\u958B\u982D\u62BC\u8A3B\u6A21\u677F\u7BA1\u7406';
+    displayName: 'Header Disclaimer Templates';
+    pluralName: 'header-disclaimer-templates';
+    singularName: 'header-disclaimer-template';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    displayName: Schema.Attribute.String & Schema.Attribute.Required;
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    isSystemDefault: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::header-disclaimer-template.header-disclaimer-template'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String &
       Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 100;
-      }> &
-      Schema.Attribute.DefaultTo<'\u7DB2\u7AD9\u540D\u7A31'>;
-    siteUrl: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 255;
-      }>;
+      Schema.Attribute.Unique;
+    publishedAt: Schema.Attribute.DateTime;
+    template: Schema.Attribute.RichText & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1034,9 +1089,11 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
-      'api::article-template.article-template': ApiArticleTemplateArticleTemplate;
+      'api::article-type-preset.article-type-preset': ApiArticleTypePresetArticleTypePreset;
       'api::author.author': ApiAuthorAuthor;
-      'api::wordpress-setting.wordpress-setting': ApiWordpressSettingWordpressSetting;
+      'api::default-content-setting.default-content-setting': ApiDefaultContentSettingDefaultContentSetting;
+      'api::footer-disclaimer-template.footer-disclaimer-template': ApiFooterDisclaimerTemplateFooterDisclaimerTemplate;
+      'api::header-disclaimer-template.header-disclaimer-template': ApiHeaderDisclaimerTemplateHeaderDisclaimerTemplate;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

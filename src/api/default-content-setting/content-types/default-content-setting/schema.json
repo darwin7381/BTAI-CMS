@@ -1,0 +1,37 @@
+{
+  "kind": "singleType",
+  "collectionName": "default_content_setting",
+  "info": {
+    "singularName": "default-content-setting",
+    "pluralName": "default-content-settings",
+    "displayName": "Default Content Settings",
+    "description": "預設內容設定 - 管理前情提要、背景補充、相關閱讀的預設文章"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "contextArticle": {
+      "type": "component",
+      "component": "content.article-link",
+      "required": false
+    },
+    "backgroundArticle": {
+      "type": "component",
+      "component": "content.article-link",
+      "required": false
+    },
+    "relatedReadingArticles": {
+      "type": "component",
+      "component": "content.article-link",
+      "repeatable": true,
+      "max": 5
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true,
+      "required": false
+    }
+  }
+}

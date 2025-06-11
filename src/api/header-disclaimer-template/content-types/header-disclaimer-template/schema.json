@@ -1,0 +1,42 @@
+{
+  "kind": "collectionType",
+  "collectionName": "header_disclaimer_templates",
+  "info": {
+    "singularName": "header-disclaimer-template",
+    "pluralName": "header-disclaimer-templates",
+    "displayName": "Header Disclaimer Templates",
+    "description": "文章開頭押註模板管理"
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "description": "系統識別碼，例：sponsored-header"
+    },
+    "displayName": {
+      "type": "string",
+      "required": true,
+      "description": "選項名稱，例：廣編稿開頭押註"
+    },
+    "template": {
+      "type": "richtext",
+      "required": true,
+      "description": "HTML 模板內容，支援變數替換 ［撰稿方名稱］"
+    },
+    "description": {
+      "type": "text",
+      "description": "模板說明"
+    },
+    "isSystemDefault": {
+      "type": "boolean",
+      "default": false,
+      "description": "系統預設項目，不可刪除"
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true,
+      "description": "是否啟用"
+    }
+  }
+}

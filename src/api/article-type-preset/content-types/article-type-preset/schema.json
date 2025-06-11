@@ -1,0 +1,72 @@
+{
+  "kind": "collectionType",
+  "collectionName": "article_type_presets",
+  "info": {
+    "singularName": "article-type-preset",
+    "pluralName": "article-type-presets",
+    "displayName": "Article Type Presets",
+    "description": "文稿類型組合配置管理"
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "description": "文稿類型顯示名稱，例：我的自訂廣編稿"
+    },
+    "code": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "description": "系統識別碼，例：my-sponsored"
+    },
+    "description": {
+      "type": "text",
+      "description": "文稿類型說明"
+    },
+    "defaultAuthor": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::author.author",
+      "required": false,
+      "description": "預設作者，可為空"
+    },
+    "headerDisclaimerTemplate": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::header-disclaimer-template.header-disclaimer-template",
+      "required": false,
+      "description": "開頭押註模板，可為空"
+    },
+    "footerDisclaimerTemplate": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::footer-disclaimer-template.footer-disclaimer-template",
+      "required": false,
+      "description": "末尾押註模板，可為空"
+    },
+    "requiresAdTemplate": {
+      "type": "boolean",
+      "default": false,
+      "description": "是否需要廣告模板"
+    },
+    "advancedSettings": {
+      "type": "json",
+      "description": "其他進階設定的 JSON 資料"
+    },
+    "isSystemDefault": {
+      "type": "boolean",
+      "default": false,
+      "description": "系統預設類型，不可刪除"
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true,
+      "description": "是否啟用"
+    },
+    "sortOrder": {
+      "type": "integer",
+      "default": 0,
+      "description": "顯示順序"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_content_article_links",
+  "info": {
+    "displayName": "Article Link",
+    "description": "文章連結組件"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

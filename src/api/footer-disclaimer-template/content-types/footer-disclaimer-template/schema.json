@@ -1,0 +1,42 @@
+{
+  "kind": "collectionType",
+  "collectionName": "footer_disclaimer_templates",
+  "info": {
+    "singularName": "footer-disclaimer-template",
+    "pluralName": "footer-disclaimer-templates",
+    "displayName": "Footer Disclaimer Templates",
+    "description": "文章末尾押註模板管理"
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "description": "系統識別碼，例：sponsored-footer"
+    },
+    "displayName": {
+      "type": "string",
+      "required": true,
+      "description": "顯示名稱，例：廣編稿免責聲明"
+    },
+    "template": {
+      "type": "richtext",
+      "required": true,
+      "description": "HTML 模板內容"
+    },
+    "description": {
+      "type": "text",
+      "description": "模板說明"
+    },
+    "isSystemDefault": {
+      "type": "boolean",
+      "default": false,
+      "description": "系統預設項目，不可刪除"
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true,
+      "description": "是否啟用"
+    }
+  }
+}

@@ -4,39 +4,37 @@
   "info": {
     "singularName": "author",
     "pluralName": "authors",
-    "displayName": "Author"
+    "displayName": "Authors",
+    "description": "文章作者管理"
   },
-  "options": {
-    "draftAndPublish": true
-  },
-  "pluginOptions": {},
   "attributes": {
     "name": {
       "type": "string",
       "required": true,
-      "unique": true
+      "unique": true,
+      "description": "作者帳號名稱"
     },
     "displayName": {
       "type": "string",
-      "required": true
+      "required": true,
+      "description": "作者顯示名稱"
     },
     "wordpressId": {
-      "type": "integer"
+      "type": "integer",
+      "description": "WordPress 系統中的作者 ID"
     },
     "department": {
-      "type": "enumeration",
-      "enum": [
-        "BTEditor",
-        "BTVerse",
-        "custom"
-      ]
+      "type": "string",
+      "description": "所屬部門"
+    },
+    "description": {
+      "type": "text",
+      "description": "作者簡介"
     },
     "isActive": {
       "type": "boolean",
-      "default": true
-    },
-    "description": {
-      "type": "text"
+      "default": true,
+      "description": "是否啟用"
     }
   }
 }
